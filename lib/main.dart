@@ -1,22 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:suraksha/ContactUs.dart';
+import 'package:suraksha/HomePage.dart';
+import 'package:suraksha/login.dart';
 import 'StartingPage.dart';
-import 'SignupPage.dart';
 import 'OnCard1.dart';
 import 'OnCard2.dart';
 import 'OnCard3.dart';
+import 'HomePage.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(Suraksha());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class Suraksha extends StatelessWidget {
+  const Suraksha({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: StartingPage(),
+      home: MyLogin(),
       theme: ThemeData(primarySwatch: Colors.deepPurple),
     );
   }

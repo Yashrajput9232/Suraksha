@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:suraksha/Oncard2.dart';
+import 'package:suraksha/login.dart';
+import 'package:suraksha/register.dart';
 import 'OnCard2.dart';
 import 'OnCard1.dart';
-import "LoginPage.dart";
+import 'Constant.dart';
 
 class OnCard3 extends StatefulWidget {
   const OnCard3({super.key});
@@ -27,7 +29,7 @@ class _OnCard3State extends State<OnCard3> {
                 Padding(
                   padding: const EdgeInsets.only(top: 40, bottom: 20),
                   child: Text(
-                    'Are you Safe',
+                    'Stay Protected',
                     style: TextStyle(
                         color: Colors.white,
                         // fontFamily: 'Sacramento',
@@ -36,14 +38,17 @@ class _OnCard3State extends State<OnCard3> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 40, bottom: 20),
-                  child: Text(
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna ',
-                    style: TextStyle(
-                      color: Colors.white,
-                      // fontFamily: 'Sacramento',
-                      fontSize: 20,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 25.0),
+                    child: Text(
+                      'This app is designed to provide you with the necessary tools and resources to ensure your protection and safety ',
+                      style: TextStyle(
+                        color: Colors.white,
+                        // fontFamily: 'Sacramento',
+                        fontSize: 20,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
                 Container(
@@ -63,11 +68,7 @@ class _OnCard3State extends State<OnCard3> {
                       onPressed: () {
                         onPressed:
                         () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => LoginPage()),
-                          );
+                          push_screen(context: context, widget: MyRegister());
                         };
                       },
                       child: Text(

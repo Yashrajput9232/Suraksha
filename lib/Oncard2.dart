@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:suraksha/Oncard3.dart';
-import 'OnCard1.dart' as card1;
 import 'OnCard3.dart' as card3;
 
 class OnCard2 extends StatefulWidget {
@@ -26,23 +24,26 @@ class _OnCard2State extends State<OnCard2> {
                 Padding(
                   padding: const EdgeInsets.only(top: 40, bottom: 20),
                   child: Text(
-                    'Being Safe',
+                    'Stay Loved',
                     style: TextStyle(
                         color: Colors.white,
-                        // fontFamily: 'Sacramento',
+                        //fontFamily: 'Sacramento',
                         fontSize: 50),
                   ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 40, bottom: 20),
-                  child: Text(
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna ',
-                    style: TextStyle(
-                      color: Colors.white,
-                      // fontFamily: 'Sacramento',
-                      fontSize: 20,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 25.0),
+                    child: Text(
+                      'You are loved by many and it is important to take care of yourself and stay safe for the sake of those who care about you.',
+                      style: TextStyle(
+                        color: Colors.white,
+                        // fontFamily: 'Sacramento',
+                        fontSize: 20,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
                 Container(

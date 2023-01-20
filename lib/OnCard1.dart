@@ -26,7 +26,7 @@ class _OnCard1State extends State<OnCard1> {
                 Padding(
                   padding: const EdgeInsets.only(top: 40, bottom: 20),
                   child: Text(
-                    'Staying Safe',
+                    'Stay Safe',
                     style: TextStyle(
                         color: Colors.white,
                         // fontFamily: 'Sacramento',
@@ -35,14 +35,17 @@ class _OnCard1State extends State<OnCard1> {
                 ),
                 Padding(
                   padding: const EdgeInsets.only(top: 40, bottom: 20),
-                  child: Text(
-                    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna ',
-                    style: TextStyle(
-                      color: Colors.white,
-                      // fontFamily: 'Sacramento',
-                      fontSize: 20,
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 25.0),
+                    child: Text(
+                      'Staying safe while driving involves following traffic laws and being aware of your surroundings at all times.',
+                      style: TextStyle(
+                        color: Colors.white,
+                        // fontFamily: 'Sacramento',
+                        fontSize: 20,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
                 Container(
