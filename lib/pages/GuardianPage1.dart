@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:suraksha/Constant/Constant.dart';
+import 'package:suraksha/item.dart';
 import 'package:suraksha/pages/HomePage.dart';
-import 'package:suraksha/pages/GuardianPage2.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class GuardianPage1 extends StatefulWidget {
   const GuardianPage1({Key? key}) : super(key: key);
@@ -11,6 +12,39 @@ class GuardianPage1 extends StatefulWidget {
 }
 
 class _GuardianPage1State extends State<GuardianPage1> {
+  TextEditingController _controllerName = TextEditingController();
+  TextEditingController _controllerNumber = TextEditingController();
+  TextEditingController _controllerRelation = TextEditingController();
+  List<Item> Guardiandetails = [];
+  @override
+  void initState() {
+    fetchRecords();
+    super.initState();
+  }
+
+  fetchRecords() async {
+    var records =
+        await FirebaseFirestore.instance.collection('Guardian details').get();
+    mapRecords(records);
+  }
+
+  mapRecords(QuerySnapshot<Map<String, dynamic>> records) {
+    var _list = records.docs
+        .map(
+          (item) => Item(
+            id: item.id,
+            name: item['name'],
+            number: item['number'],
+            relation: item['relation'],
+          ),
+        )
+        .toList();
+
+    setState(() {
+      Guardiandetails = _list;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -42,6 +76,7 @@ class _GuardianPage1State extends State<GuardianPage1> {
                       child: Column(
                         children: [
                           TextField(
+                            controller: _controllerName,
                             style: const TextStyle(color: Colors.white),
                             decoration: InputDecoration(
                                 enabledBorder: OutlineInputBorder(
@@ -66,6 +101,7 @@ class _GuardianPage1State extends State<GuardianPage1> {
                             height: 30,
                           ),
                           TextField(
+                            controller: _controllerNumber,
                             style: const TextStyle(color: Colors.white),
                             decoration: InputDecoration(
                                 enabledBorder: OutlineInputBorder(
@@ -90,6 +126,7 @@ class _GuardianPage1State extends State<GuardianPage1> {
                             height: 30,
                           ),
                           TextField(
+                            controller: _controllerRelation,
                             style: const TextStyle(color: Colors.white),
                             obscureText: true,
                             decoration: InputDecoration(
@@ -125,6 +162,14 @@ class _GuardianPage1State extends State<GuardianPage1> {
                                     color:
                                         const Color.fromARGB(255, 29, 28, 28),
                                     onPressed: () {
+                                      Map<String, String> dataToSave = {
+                                        'name': _controllerName.text,
+                                        'number': _controllerNumber.text,
+                                        'relation': _controllerRelation.text,
+                                      };
+                                      FirebaseFirestore.instance
+                                          .collection('Guardian Details')
+                                          .add(dataToSave);
                                       push_screen(
                                           context: context,
                                           widget: const HomePage());
@@ -135,33 +180,8 @@ class _GuardianPage1State extends State<GuardianPage1> {
                               )
                             ],
                           ),
-                          const SizedBox(
-                            height: 40,
-                          ),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const GuardianPage2()),
-                                  );
-                                },
-                                style: const ButtonStyle(),
-                                child: const Text(
-                                  'Add another guardian',
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                      decoration: TextDecoration.underline,
-                                      color: Colors.white,
-                                      fontSize: 18),
-                                ),
-                              ),
-                            ],
-                          )
+                          
+                          
                         ],
                       ),
                     )
