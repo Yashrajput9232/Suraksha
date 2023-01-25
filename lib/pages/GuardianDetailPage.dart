@@ -1,26 +1,52 @@
-// ignore_for_file: prefer_final_fields, no_leading_underscores_for_local_identifiers, library_private_types_in_public_api, avoid_function_literals_in_foreach_calls, unnecessary_null_comparison, unused_local_variable, unused_import
+// ignore_for_file: prefer_final_fields, no_leading_underscores_for_local_identifiers, library_private_types_in_public_api, avoid_function_literals_in_foreach_calls, unnecessary_null_comparison, unused_local_variable, avoid_print
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:suraksha/Constant/Constant.dart';
 import 'package:suraksha/item.dart';
-import 'package:suraksha/pages/HomePage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class GuardianPage1 extends StatefulWidget {
-  const GuardianPage1({Key? key}) : super(key: key);
+class GuardianDetailPage extends StatefulWidget {
+  const GuardianDetailPage({Key? key}) : super(key: key);
 
   @override
-  _GuardianPage1State createState() => _GuardianPage1State();
+  _GuardianDetailPageState createState() => _GuardianDetailPageState();
 }
 
-class _GuardianPage1State extends State<GuardianPage1> {
+class _GuardianDetailPageState extends State<GuardianDetailPage> {
   TextEditingController _controllerName = TextEditingController();
   TextEditingController _controllerNumber = TextEditingController();
   TextEditingController _controllerRelation = TextEditingController();
+  List<Item> guardiandetails = [];
   FirebaseAuth _auth = FirebaseAuth.instance;
   bool isLoading = false;
-  
+
+  @override
+  void initState() {
+    fetchRecords();
+    super.initState();
+  }
+
+  fetchRecords() async {
+    var record = await FirebaseFirestore.instance
+        .collection('Guardian Details')
+        .doc(_auth.currentUser!.email)
+        .get();
+    Item item = mapRecords(record);
+    _controllerName.text = item.name!;
+    _controllerNumber.text = item.number!;
+    _controllerRelation.text = item.relation!;
+    setState(() {});
+  }
+
+  Item mapRecords(DocumentSnapshot<Map<String, dynamic>> records) {
+    return Item.fromJson(records.data() ??
+        {
+          'name': "",
+          'number': "",
+          'relation': "",
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -36,7 +62,7 @@ class _GuardianPage1State extends State<GuardianPage1> {
             Container(
               padding: const EdgeInsets.only(left: 35, top: 30),
               child: const Text(
-                "Enter Your\nGuardian's details",
+                "Update \nGuardian's details",
                 style: TextStyle(color: Colors.white, fontSize: 33),
               ),
             ),
@@ -150,23 +176,27 @@ class _GuardianPage1State extends State<GuardianPage1> {
                                           .doc(_auth.currentUser!.email)
                                           .set(dataToSave)
                                           .then((value) {
-                                             setState(() {
-                                        isLoading = false;
-                                      });
-                                        push_screen(
-                                            context: context,
-                                            widget: const HomePage());
+                                        setState(() {
+                                          isLoading = false;
+                                        });
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(const SnackBar(
+                                              backgroundColor: Colors.black,
+                                                content: Text(
+                                                    "Details Updated Successfully!",style: TextStyle(color: Colors.white),)));
                                       });
                                     },
-                                    icon: isLoading ? const SizedBox(
-                                      height: 10,
-                                      width: 10,
-                                      child: CircularProgressIndicator(
-                                       color: Colors.black,
-
-                                    ),) : const Icon(
-                                      Icons.arrow_forward,
-                                    )),
+                                    icon: isLoading
+                                        ? const SizedBox(
+                                            height: 10,
+                                            width: 10,
+                                            child: CircularProgressIndicator(
+                                              color: Colors.black,
+                                            ),
+                                          )
+                                        : const Icon(
+                                            Icons.update,
+                                          )),
                               )
                             ],
                           ),

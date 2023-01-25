@@ -1,6 +1,12 @@
+// ignore_for_file: non_constant_identifier_names, unused_import
+
 import 'dart:async';
 import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:suraksha/item.dart';
 import '../utility classes/MenuBar.dart';
 import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 import 'package:sensors_plus/sensors_plus.dart';
@@ -20,7 +26,9 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String message = "This is a test message!";
-  List<String> recipents = ["1234567890", "5556787676"];
+  List<String> recipents = [];
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  late Item item;
   bool sendNotification = false;
   double previousVelocity = 0;
   double currentVelocity = 0;
@@ -31,8 +39,9 @@ class _HomePageState extends State<HomePage> {
   late StreamSubscription subscription;
   late StreamSubscription userAcclometerSubscription;
   late StreamSubscription<NoiseReading> noiseSubscription;
-  List<double> locationCoordinates=[0,0];
+  List<double> locationCoordinates = [0, 0];
   Position? position;
+
   void smsPermission() async {
     await Permission.sms.isGranted.then((isAllowed) {
       if (isAllowed == false) {
@@ -92,8 +101,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   bool accidentCondition(currentVelocity, previousVelocity, noiseInDecibal) {
-    // print(currentVelocity);
-    if ( previousVelocity- currentVelocity> 60 || noiseInDecibal > 140) {
+    if (previousVelocity - currentVelocity > 60 || noiseInDecibal > 140) {
       return true;
     }
     return false;
@@ -137,11 +145,11 @@ class _HomePageState extends State<HomePage> {
           });
         } else {
           if (event) {
-           setState(() {
-             notification = 1;
-             _sendSMS();
-             isCancel=false;
-           });
+            setState(() {
+              notification = 1;
+              _sendSMS();
+              isCancel = false;
+            });
           }
         }
       },
@@ -154,6 +162,17 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _sendSMS() async {
+    DocumentSnapshot<Map<String, dynamic>> snapshot = await FirebaseFirestore
+        .instance
+        .collection('Guardian Details')
+        .doc(_auth.currentUser!.email!)
+        .get();
+    item = Item.fromJson(snapshot.data() ??
+        {
+          'name': "",
+          'number': "",
+          'relation': "",
+        });
     try {
       position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.bestForNavigation);
@@ -164,17 +183,13 @@ class _HomePageState extends State<HomePage> {
       locationCoordinates[0] = position!.longitude;
       locationCoordinates[1] = position!.latitude;
     });
-    String message = "This message is from Surksha app Our app dectect the Accident of your friend \n Here Is The Location \n http://www.google.com/maps/place/${locationCoordinates[0]},${locationCoordinates[1]}";
-    List<String> recipents = ["1234567890", "5556787676"];
-
-    String result =
-        await sendSMS(message: message, recipients: recipents, sendDirect: true)
-            .catchError((onError) {
-      print(onError);
-    });
-    print(result);
+    String message =
+        "This message is from Surksha app Our app dectect the Accident of your friend \n Here Is The Location \n http://www.google.com/maps/place/${locationCoordinates[0]},${locationCoordinates[1]}";
+    List<String> recipents = [item.number!];
+    String result = await sendSMS(
+        message: message, recipients: recipents, sendDirect: true);
     setState(() {
-      isCancel=false;
+      isCancel = false;
     });
   }
 
@@ -212,7 +227,6 @@ class _HomePageState extends State<HomePage> {
         isRecording = false;
         noiseInDecibal = 0.0;
       });
-
     }
   }
 
@@ -235,6 +249,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     smsPermission();
+    
     AwesomeNotifications().isNotificationAllowed().then((isAllowed) {
       if (!isAllowed) {
         AwesomeNotifications().requestPermissionToSendNotifications();

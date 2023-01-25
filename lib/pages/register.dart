@@ -1,3 +1,5 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'package:flutter/material.dart';
 import 'package:suraksha/Constant/Constant.dart';
 import 'package:suraksha/pages/GuardianPage1.dart';
@@ -146,12 +148,14 @@ class _MyRegisterState extends State<MyRegister> {
                                           password: passwordController.text)
                                       .then((value) {
                                     print("created new account");
-                                  }).onError((error, stackTrace) {
-                                    print("Error ${error.toString()}");
-                                  });
-                                  push_screen(
+                                    push_screen(
                                       context: context,
                                       widget: const MyLogin());
+                                  }).onError((error, stackTrace) {
+                                    print("Error ${error.toString()}");
+                                  }).then((value){
+                                     
+                                  });             
                                 },
                                 style: const ButtonStyle(),
                                 child: const Text(
