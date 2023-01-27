@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:suraksha/Constant/Constant.dart';
 import 'ResetPassword.dart';
+import 'package:email_validator/email_validator.dart';
 
 class EmailVerification extends StatefulWidget {
   const EmailVerification({Key? key}) : super(key: key);
@@ -38,7 +39,7 @@ class _EmailVerificationState extends State<EmailVerification> {
   //     print("Invalid OTP");
   //   }
   // }
-
+  final formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -52,74 +53,99 @@ class _EmailVerificationState extends State<EmailVerification> {
               backgroundColor: Colors.transparent,
               elevation: 0,
             ),
-            body: Stack(children: [
-              Container(
-                padding: EdgeInsets.only(left: 35, top: 30),
-                child: Text(
-                  'Email\nVerification',
-                  style: TextStyle(color: Colors.white, fontSize: 33),
+            body: Form(
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              key: formKey,
+              child: Stack(children: [
+                Container(
+                  padding: EdgeInsets.only(left: 35, top: 30),
+                  child: Text(
+                    'Email\nVerification',
+                    style: TextStyle(color: Colors.white, fontSize: 33),
+                  ),
                 ),
-              ),
-              SizedBox(
-                height: 20.0,
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 25, top: 225, right: 25),
-                child: Column(
-                  children: [
-                    TextField(
-                      controller: _emailController,
-                      keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(
-                          hintText: "Enter Email",
-                          labelText: "Email",
-                          suffixIcon: TextButton(
-                            child: Text("Send OTP"),
-                            onPressed: () async {
-                              myauth.setConfig(
-                                  appEmail: "sejalbarai8@gmail.com",
-                                  appName: "Email OTP",
-                                  userEmail: _emailController.text,
-                                  otpLength: 6,
-                                  otpType: OTPType.digitsOnly);
-                              if (await myauth.sendOTP() == true) {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                  content: Text("OTP has been sent"),
-                                ));
-                              } else {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(const SnackBar(
-                                  content: Text("Oops, OTP send failed"),
-                                ));
-                              }
-                            },
-                          )),
-                    ),
-                    SizedBox(
-                      height: 30.0,
-                    ),
-                    TextField(
-                      controller: _otpController,
-                      keyboardType: TextInputType.number,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        hintText: "Enter OTP",
-                        labelText: "OTP",
+                SizedBox(
+                  height: 20.0,
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 25, top: 225, right: 25),
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        validator: (email) =>
+                            email != null && !EmailValidator.validate(email)
+                                ? 'Enter a valid email' //form is not valid
+                                : null, // form is valid
+
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                        decoration: InputDecoration(
+                            hintText: "Enter Email",
+                            labelText: "Email",
+                            suffixIcon: TextButton(
+                              child: Text("Send OTP"),
+                              onPressed: () async {
+                                myauth.setConfig(
+                                    appEmail: "sejalbarai8@gmail.com",
+                                    appName: "Email OTP",
+                                    userEmail: _emailController.text,
+                                    otpLength: 6,
+                                    otpType: OTPType.digitsOnly);
+                                if (await myauth.sendOTP() == true) {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(const SnackBar(
+                                    content: Text("OTP has been sent"),
+                                  ));
+                                } else {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(const SnackBar(
+                                    content: Text("Oops, OTP send failed"),
+                                  ));
+                                }
+                              },
+                            )),
                       ),
-                    ),
-                    SizedBox(
-                      height: 30.0,
-                    ),
-                    ElevatedButton(
-                      child: Text("Verify OTP"),
-                      onPressed: () {
-                        push_screen(context: context, widget: ResetPassword());
-                      },
-                    )
-                  ],
-                ),
-              )
-            ])));
+                      SizedBox(
+                        height: 30.0,
+                      ),
+                      TextFormField(
+                        // The validator receives the text that the user has entered
+
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter the correct six digit otp';
+                          } else {
+                            return null; // form is valid
+                          }
+                        },
+                        controller: _otpController,
+                        keyboardType: TextInputType.number,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          hintText: "Enter OTP",
+                          labelText: "OTP",
+                        ),
+                      ),
+                      SizedBox(
+                        height: 30.0,
+                      ),
+                      ElevatedButton(
+                        child: Text("Verify OTP"),
+                        onPressed: () {
+                          final isValidForm = formKey.currentState!.validate();
+                          if (isValidForm) {
+                            push_screen(
+                                context: context, widget: ResetPassword());
+                          }
+                          else {
+                           return null;
+                          }
+                        },
+                      )
+                    ],
+                  ),
+                )
+              ]),
+            )));
   }
 }
