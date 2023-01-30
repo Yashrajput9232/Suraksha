@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:suraksha/Auth.dart';
 import 'package:suraksha/Constant/Constant.dart';
 import 'package:suraksha/pages/ForgetPassword.dart';
 import 'package:suraksha/pages/HomePage.dart';
 import 'package:suraksha/pages/register.dart';
 import 'package:email_validator/email_validator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MyLogin extends StatefulWidget {
   const MyLogin({Key? key}) : super(key: key);
@@ -14,6 +16,14 @@ class MyLogin extends StatefulWidget {
 
 class _MyLoginState extends State<MyLogin> {
   final formKey = GlobalKey<FormState>();
+   TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
+  final AuthService _auth = AuthService();
+  
+  
+  String email = ' ';
+  String password = ' ';
+  String error = ' ';
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -46,10 +56,12 @@ class _MyLoginState extends State<MyLogin> {
                           children: [
                             TextFormField(
 
-                              validator: (email) =>
-                                  email != null && !EmailValidator.validate(email)
-                                      ? 'Enter a valid email' //form is not valid
-                                      : null, // form is valid
+                               validator: (val) =>
+                                  val!.isEmpty ? 'Enter an email' : null,
+                              onChanged: (val) {
+                                setState(() => email = val);
+                              },
+                              controller: emailController,
 
                               style: const TextStyle(color: kFieldTextColor),
                               decoration: InputDecoration(
@@ -65,15 +77,13 @@ class _MyLoginState extends State<MyLogin> {
                             ),
                             TextFormField(
 
-                              // The validator receives the text that the user has entered
-        
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please enter the correct password';
-                                } else {
-                                  return null; // form is valid
-                                }
+                              validator: (val) => val!.length < 6
+                                  ? 'Enter a password 6+ chars long'
+                                  : null,
+                              onChanged: (val) {
+                                setState(() => password = val);
                               },
+                              controller: passwordController,
 
                               style: const TextStyle(),
                               obscureText: true,
@@ -106,16 +116,24 @@ class _MyLoginState extends State<MyLogin> {
                                       color: Colors.white,
                                       onPressed: () {
                                         
-                                        final isValidForm =
-                                            formKey.currentState!.validate();
-                                        if (isValidForm) {
-                                          push_screen(
-                                              context: context,
-                                              widget: const HomePage());
+                                          if (formKey.currentState!.validate()) {
+                                          FirebaseAuth.instance
+                                              .signInWithEmailAndPassword(
+                                                  email: emailController.text,
+                                                  password:
+                                                      passwordController.text)
+                                              .then((value) {
+                                            print("the value is $value");
+
+                                           push_screen(
+                                        context: context,
+                                        widget: const HomePage());
+                                          }).onError((error, stackTrace) {
+                                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                      content: Text("Invalid Credentials"),
+                                      ));
+                                          });
                                         }
-                                         else {
-                                            return null;
-                                          }
                                           
                                       },
                                       icon: const Icon(
