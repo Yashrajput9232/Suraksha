@@ -1,4 +1,4 @@
-// ignore_for_file: library_private_types_in_public_api
+// ignore_for_file: library_private_types_in_public_api, prefer_const_constructors, avoid_print, unused_import
 
 import 'package:flutter/material.dart';
 import 'package:suraksha/Auth.dart';
@@ -15,17 +15,15 @@ class MyRegister extends StatefulWidget {
 }
 
 class _MyRegisterState extends State<MyRegister> {
-  TextEditingController emailController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-
-   final AuthService _auth = AuthService();
-
+  TextEditingController emailController = TextEditingController(text: "tush1245@gmail.com");
+  TextEditingController passwordController = TextEditingController(text: "11tusmli89");
+  final AuthService _auth = AuthService();
+  bool isLoading = false;
   final _formKey = GlobalKey<FormState>();
 
   String email = ' ';
   String password = ' ';
   String error = ' ';
-
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +40,7 @@ class _MyRegisterState extends State<MyRegister> {
           backgroundColor: Colors.transparent,
           elevation: 0,
         ),
-        body: 
-        
-        Form(
+        body: Form(
           autovalidateMode: AutovalidateMode.onUserInteraction,
           key: _formKey,
           child: Stack(
@@ -68,10 +64,8 @@ class _MyRegisterState extends State<MyRegister> {
                         child: Column(
                           children: [
                             TextFormField(
-
                               validator: (val) =>
                                   val!.isEmpty ? 'Enter a name' : null,
-
                               style: const TextStyle(),
                               decoration: InputDecoration(
                                   fillColor:
@@ -82,16 +76,15 @@ class _MyRegisterState extends State<MyRegister> {
                                     borderRadius: BorderRadius.circular(10),
                                   )),
                             ),
-        
+
                             //Gap
-        
+
                             const SizedBox(
                               height: 30,
                             ),
-        
+
                             //Enter your Email
                             TextFormField(
-
                               validator: (val) =>
                                   val!.isEmpty ? 'Enter an email' : null,
                               onChanged: (val) {
@@ -108,8 +101,8 @@ class _MyRegisterState extends State<MyRegister> {
                                     borderRadius: BorderRadius.circular(10),
                                   )),
                             ),
-        
-        //Gap
+
+                            //Gap
                             const SizedBox(
                               height: 30,
                             ),
@@ -121,9 +114,6 @@ class _MyRegisterState extends State<MyRegister> {
                               onChanged: (val) {
                                 setState(() => password = val);
                               },
-
-
-
                               controller: passwordController,
                               style: const TextStyle(),
                               obscureText: true,
@@ -137,11 +127,11 @@ class _MyRegisterState extends State<MyRegister> {
                                   )),
                             ),
                             //gap
-        
+
                             const SizedBox(
                               height: 40,
                             ),
-        
+
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -158,57 +148,71 @@ class _MyRegisterState extends State<MyRegister> {
                                   child: IconButton(
                                       color: Colors.white,
                                       onPressed: () {
-                                        push_screen(
-                                          context: context,
-                                          widget: const GuardianPage1(),
-                                        );
+                                        if (_formKey.currentState!.validate()) {
+                                          setState(() {
+                                            isLoading = true;
+                                          });
+                                          FirebaseAuth.instance
+                                              .createUserWithEmailAndPassword(
+                                                  email: emailController.text,
+                                                  password:
+                                                      passwordController.text)
+                                              .then((value) {
+                                                  setState(() {
+                                              isLoading = false;
+                                            });
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                              content: Text(
+                                                  "Account Created Successfully!"),
+                                            ));
+
+                                            push_screen(
+                                                context: context,
+                                                widget: const GuardianPage1());
+                                          }).onError((error, stackTrace) {
+                                            print("Error ${error.toString()}");
+                                              setState(() {
+                                              isLoading = false;
+                                            });
+                                          });
+                                        }
                                       },
-                                      icon: const Icon(
-                                        Icons.arrow_forward,
-                                      )),
+                                      icon: isLoading
+                                          ? const SizedBox(
+                                              height: 20,
+                                              width: 20,
+                                              child: CircularProgressIndicator(
+                                                color: Colors.white,
+                                                strokeWidth: 1.5,
+                                              ),
+                                            )
+                                          : const Icon(
+                                              Icons.arrow_forward,
+                                            )),
                                 )
                               ],
                             ),
                             const SizedBox(
                               height: 40,
                             ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                TextButton(
-                                  onPressed: () {
-                                    if (_formKey.currentState!.validate()){ 
-                                       FirebaseAuth.instance
-                                        .createUserWithEmailAndPassword(
-                                            email: emailController.text,
-                                            password: passwordController.text)
-                                        .then((value) {
-                                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                      content: Text("Account Created Successfully!"),
-                                      ));
-                                      push_screen(
-                                        context: context,
-                                        widget: const MyLogin());
-                                    }).onError((error, stackTrace) {
-                                      print("Error ${error.toString()}");
-                                    }).then((value){
-                                       
-                                    });  
-                                    }
-                                              
-                                  },
-                                  style: const ButtonStyle(),
-                                  child: const Text(
-                                    'Sign In',
-                                    textAlign: TextAlign.left,
-                                    style: TextStyle(
-                                        decoration: TextDecoration.underline,
-                                        color: Colors.white,
-                                        fontSize: 18),
-                                  ),
-                                ),
-                              ],
-                            )
+                            // Row(
+                            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            //   children: [
+                            //     TextButton(
+                            //       onPressed: () {},
+                            //       style: const ButtonStyle(),
+                            //       child: const Text(
+                            //         'Sign In',
+                            //         textAlign: TextAlign.left,
+                            //         style: TextStyle(
+                            //             decoration: TextDecoration.underline,
+                            //             color: Colors.white,
+                            //             fontSize: 18),
+                            //       ),
+                            //     ),
+                            //   ],
+                            // )
                           ],
                         ),
                       )

@@ -1,5 +1,8 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suraksha/pages/GuardianDetailPage.dart';
 import 'package:suraksha/pages/PolicyPage.dart';
 import 'package:suraksha/pages/login.dart';
@@ -10,6 +13,8 @@ class NavBar extends StatelessWidget {
   String image =
       'https://oflutter.com/wp-content/uploads/2021/02/girl-profile.png';
   final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  NavBar({super.key});
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -17,15 +22,20 @@ class NavBar extends StatelessWidget {
         // Remove padding
         padding: EdgeInsets.zero,
         children: [
- UserAccountsDrawerHeader(
-            accountName: Text((_auth.currentUser!.displayName == null || _auth.currentUser!.displayName!.isEmpty)  ? "User" : _auth.currentUser!.displayName!),
+          UserAccountsDrawerHeader(
+            accountName: Text((_auth.currentUser!.displayName == null ||
+                    _auth.currentUser!.displayName!.isEmpty)
+                ? "User"
+                : _auth.currentUser!.displayName!),
             accountEmail: Text(_auth.currentUser!.email!),
-            decoration:  BoxDecoration(
+            decoration: BoxDecoration(
               color: Colors.blue,
               image: DecorationImage(
                 fit: BoxFit.fill,
-                image: NetworkImage(
-                   (_auth.currentUser!.photoURL== null || _auth.currentUser!.photoURL!.isEmpty) ? 'https://t4.ftcdn.net/jpg/04/13/42/61/360_F_413426103_zBEu5NRrZHkiNcgiHeJAqcOQsmsdEMy3.jpg' :  _auth.currentUser!.photoURL!),
+                image: NetworkImage((_auth.currentUser!.photoURL == null ||
+                        _auth.currentUser!.photoURL!.isEmpty)
+                    ? 'https://t4.ftcdn.net/jpg/04/13/42/61/360_F_413426103_zBEu5NRrZHkiNcgiHeJAqcOQsmsdEMy3.jpg'
+                    : _auth.currentUser!.photoURL!),
               ),
             ),
           ),
@@ -65,13 +75,18 @@ class NavBar extends StatelessWidget {
           ListTile(
               title: const Text('Exit'),
               leading: const Icon(Icons.exit_to_app),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const MyLogin(),
-                  ),
-                );
+              onTap: () async {
+                SharedPreferences pref = await SharedPreferences.getInstance();
+                pref.clear().then((value) {
+                  if (value) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const MyLogin(),
+                      ),
+                    );
+                  }
+                });
               }),
         ],
       ),

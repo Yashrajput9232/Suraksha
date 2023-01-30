@@ -1,4 +1,7 @@
+// ignore_for_file: prefer_const_constructors, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suraksha/Auth.dart';
 import 'package:suraksha/Constant/Constant.dart';
 import 'package:suraksha/pages/ForgetPassword.dart';
@@ -16,11 +19,10 @@ class MyLogin extends StatefulWidget {
 
 class _MyLoginState extends State<MyLogin> {
   final formKey = GlobalKey<FormState>();
-   TextEditingController emailController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   final AuthService _auth = AuthService();
-  
-  
+
   String email = ' ';
   String password = ' ';
   String error = ' ';
@@ -32,7 +34,7 @@ class _MyLoginState extends State<MyLogin> {
         backgroundColor: Colors.transparent,
         body: Form(
           autovalidateMode: AutovalidateMode.onUserInteraction,
-              key: formKey,
+          key: formKey,
           child: Stack(
             children: [
               Container(),
@@ -55,14 +57,12 @@ class _MyLoginState extends State<MyLogin> {
                         child: Column(
                           children: [
                             TextFormField(
-
-                               validator: (val) =>
+                              validator: (val) =>
                                   val!.isEmpty ? 'Enter an email' : null,
                               onChanged: (val) {
                                 setState(() => email = val);
                               },
                               controller: emailController,
-
                               style: const TextStyle(color: kFieldTextColor),
                               decoration: InputDecoration(
                                   fillColor: kFieldFillColor,
@@ -76,7 +76,6 @@ class _MyLoginState extends State<MyLogin> {
                               height: 30,
                             ),
                             TextFormField(
-
                               validator: (val) => val!.length < 6
                                   ? 'Enter a password 6+ chars long'
                                   : null,
@@ -84,7 +83,6 @@ class _MyLoginState extends State<MyLogin> {
                                 setState(() => password = val);
                               },
                               controller: passwordController,
-
                               style: const TextStyle(),
                               obscureText: true,
                               decoration: InputDecoration(
@@ -115,26 +113,34 @@ class _MyLoginState extends State<MyLogin> {
                                   child: IconButton(
                                       color: Colors.white,
                                       onPressed: () {
-                                        
-                                          if (formKey.currentState!.validate()) {
+                                        if (formKey.currentState!.validate()) {
                                           FirebaseAuth.instance
                                               .signInWithEmailAndPassword(
                                                   email: emailController.text,
                                                   password:
                                                       passwordController.text)
-                                              .then((value) {
-                                            print("the value is $value");
-
-                                           push_screen(
-                                        context: context,
-                                        widget: const HomePage());
+                                              .then((value) async {
+                                            SharedPreferences pref =
+                                                await SharedPreferences
+                                                    .getInstance();
+                                            pref
+                                                .setString("email",
+                                                    emailController.text)
+                                                .then((value) {
+                                              if (value) {
+                                                push_screen(
+                                                    context: context,
+                                                    widget: const HomePage());
+                                              }
+                                            });
                                           }).onError((error, stackTrace) {
-                                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                      content: Text("Invalid Credentials"),
-                                      ));
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(SnackBar(
+                                              content:
+                                                  Text("Invalid Credentials"),
+                                            ));
                                           });
                                         }
-                                          
                                       },
                                       icon: const Icon(
                                         Icons.arrow_forward,
@@ -160,7 +166,8 @@ class _MyLoginState extends State<MyLogin> {
                                     textAlign: TextAlign.left,
                                     style: TextStyle(
                                         decoration: TextDecoration.underline,
-                                        color: Color.fromARGB(255, 255, 255, 255),
+                                        color:
+                                            Color.fromARGB(255, 255, 255, 255),
                                         fontSize: 18),
                                   ),
                                 ),
@@ -174,7 +181,8 @@ class _MyLoginState extends State<MyLogin> {
                                       'Forgot Password',
                                       style: TextStyle(
                                         decoration: TextDecoration.underline,
-                                        color: Color.fromARGB(255, 255, 255, 255),
+                                        color:
+                                            Color.fromARGB(255, 255, 255, 255),
                                         fontSize: 18,
                                       ),
                                     )),

@@ -6,6 +6,7 @@ import 'package:suraksha/Constant/Constant.dart';
 import 'package:suraksha/item.dart';
 import 'package:suraksha/pages/HomePage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:suraksha/pages/login.dart';
 
 class GuardianPage1 extends StatefulWidget {
   const GuardianPage1({Key? key}) : super(key: key);
@@ -20,7 +21,7 @@ class _GuardianPage1State extends State<GuardianPage1> {
   TextEditingController _controllerRelation = TextEditingController();
   FirebaseAuth _auth = FirebaseAuth.instance;
   bool isLoading = false;
-  
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -150,23 +151,26 @@ class _GuardianPage1State extends State<GuardianPage1> {
                                           .doc(_auth.currentUser!.email)
                                           .set(dataToSave)
                                           .then((value) {
-                                             setState(() {
-                                        isLoading = false;
-                                      });
+                                        setState(() {
+                                          isLoading = false;
+                                        });
                                         push_screen(
                                             context: context,
-                                            widget: const HomePage());
+                                            widget: const MyLogin());
                                       });
                                     },
-                                    icon: isLoading ? const SizedBox(
-                                      height: 10,
-                                      width: 10,
-                                      child: CircularProgressIndicator(
-                                       color: Colors.black,
-
-                                    ),) : const Icon(
-                                      Icons.arrow_forward,
-                                    )),
+                                    icon: isLoading
+                                        ? const SizedBox(
+                                            height: 20,
+                                            width: 20,
+                                            child: CircularProgressIndicator(
+                                              color: Colors.black,
+                                              strokeWidth: 1.5,
+                                            ),
+                                          )
+                                        : const Icon(
+                                            Icons.arrow_forward,
+                                          )),
                               )
                             ],
                           ),

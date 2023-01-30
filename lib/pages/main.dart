@@ -1,16 +1,17 @@
 // ignore_for_file: unused_import
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:suraksha/pages/login.dart';
 import 'package:suraksha/pages/HomePage.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:firebase_core/firebase_core.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   AwesomeNotifications().initialize(
-    // set the icon to null if you want to use the default app icon
+      // set the icon to null if you want to use the default app icon
       null,
       [
         NotificationChannel(
@@ -30,18 +31,45 @@ void main() async{
             channelGroupName: 'Basic group')
       ],
       debug: true);
-  runApp(Suraksha());
+  runApp(const Suraksha());
 }
 
-class Suraksha extends StatelessWidget {
+class Suraksha extends StatefulWidget {
   const Suraksha({super.key});
+
+  @override
+  State<Suraksha> createState() => _SurakshaState();
+}
+
+class _SurakshaState extends State<Suraksha> {
+  Widget home = const Scaffold();
+
+  void switchHome() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String? email = pref.getString("email");
+    if (email == null) {
+      setState(() {
+        home = const MyLogin();
+      });
+    } else {
+      setState(() {
+        home = const HomePage();
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    switchHome();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       // home:  MyLogin(),
-      home: HomePage(),
+      home: home,
       theme: ThemeData(primarySwatch: Colors.deepPurple),
     );
   }
